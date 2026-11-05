@@ -1,98 +1,245 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# Sales CRM API
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A REST API for a **Sales Analytics CRM** built with **NestJS**, **Prisma/PostgreSQL**, **Domain-Driven Design (DDD)** and **Clean Architecture**.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+Salespersons manage their **clients** and **sales opportunities**, while **managers** administer the sales team and get notified about high-value deals. The business rules live in a framework-agnostic domain/application core; NestJS, Prisma, JWT and bcrypt are plugged in as infrastructure adapters.
 
-## Description
+## Table of Contents
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- [Features](#features)
+- [Business Rules](#business-rules)
+- [Implementation Status](#implementation-status)
+- [Tech Stack](#tech-stack)
+- [Getting Started](#getting-started)
+- [Environment Variables](#environment-variables)
+- [Scripts](#scripts)
+- [API Overview](#api-overview)
+- [Project Structure](#project-structure)
+- [Architecture](#architecture)
+- [Testing](#testing)
+- [Documentation](#documentation)
+- [Roadmap](#roadmap)
 
-## Project setup
+## Features
+
+- Two user roles: **Salesperson** and **Sales Manager**.
+- E-mail and password authentication, returning a JWT access token.
+- Salesperson management (manager-only): register, list, get by ID, update, change password and inactivate (soft delete).
+- Client registration, owned by the logged-in salesperson.
+- Domain events for sales opportunities (created, status changed, high value, lost, delivered) with manager notifications.
+- Request validation with Zod and interactive API docs with Swagger.
+
+## Business Rules
+
+- Only **managers** can manage salespersons (register, list, read, update, change password, inactivate).
+- Only the **logged-in salesperson** can manage their own clients.
+- Every client has an associated salesperson; the **first one is the salesperson who created it**.
+- Every sales opportunity belongs to a **client** and a **salesperson**; its creator is its first owner.
+- Marking an opportunity as **delivered** requires a photo, and is only possible from the `won` status.
+- An opportunity can only be marked as **lost** while `open` or `in_progress`.
+- A salesperson **cannot list another salesperson's** sales.
+- Inactive salespersons **cannot authenticate**.
+- The manager is notified when a sales opportunity reaches a **high value (>= 10,000)**.
+
+## Implementation Status
+
+The domain and application layers are complete and unit-tested. The HTTP layer is being exposed incrementally.
+
+| Area                 | Domain + use cases | HTTP endpoint |
+| -------------------- | :----------------: | :-----------: |
+| Authentication       | Done               | Done          |
+| Salespersons         | Done               | Done          |
+| Clients              | Done               | Register only |
+| Sales opportunities  | Done               | Pending       |
+
+## Tech Stack
+
+| Concern         | Tool                                                              |
+| --------------- | ----------------------------------------------------------------- |
+| Framework       | [NestJS 11](https://nestjs.com/)                                  |
+| Language        | [TypeScript](https://www.typescriptlang.org/) (strict)            |
+| Database        | [PostgreSQL 17](https://www.postgresql.org/)                      |
+| ORM             | [Prisma 6](https://www.prisma.io/)                                |
+| Auth            | JWT (`@nestjs/jwt`, `passport-jwt`) + `bcryptjs`                  |
+| Validation      | [Zod](https://zod.dev/)                                           |
+| API docs        | Swagger (`@nestjs/swagger`)                                       |
+| Tests           | [Vitest](https://vitest.dev/) + Supertest + SWC                   |
+| Tooling         | ESLint, Prettier, pnpm, Docker                                    |
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js `24` (see `.nvmrc`)
+- [pnpm](https://pnpm.io/) (`corepack enable`)
+- Docker (for PostgreSQL)
+
+### 1. Install dependencies
 
 ```bash
-$ pnpm install
+pnpm install
 ```
 
-## Compile and run the project
+### 2. Configure the environment
 
 ```bash
-# development
-$ pnpm run start
-
-# watch mode
-$ pnpm run start:dev
-
-# production mode
-$ pnpm run start:prod
+cp .env.example .env
 ```
 
-## Run tests
+Then set a strong `JWT_SECRET`. See [Environment Variables](#environment-variables).
+
+### 3. Start the database
 
 ```bash
-# unit tests
-$ pnpm run test
-
-# e2e tests
-$ pnpm run test:e2e
-
-# test coverage
-$ pnpm run test:cov
+docker compose up -d db
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+### 4. Run migrations and seed
 
 ```bash
-$ pnpm install -g mau
-$ mau deploy
+pnpm prisma migrate deploy
+pnpm prisma db seed
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+The seed creates a default manager so you can log in and register other users:
 
-## Resources
+| E-mail          | Password   | Role      |
+| --------------- | ---------- | --------- |
+| `admin@crm.com` | `password` | `manager` |
 
-Check out a few resources that may come in handy when working with NestJS:
+> Change or remove this account before any real deployment.
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+### 5. Run the API
 
-## Support
+```bash
+pnpm start:dev
+```
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+- API: `http://localhost:3333`
+- Swagger UI: `http://localhost:3333/swagger` (JSON at `/swagger/json`)
 
-## Stay in touch
+Ready-to-use sample requests are available in [`client.http`](client.http) (VS Code REST Client).
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+### Running everything with Docker
+
+```bash
+docker compose up --build
+```
+
+The API is published on `http://localhost:3333`. Migrations are not run by Compose; apply them from your machine as in step 4. See [docs/development.md](docs/development.md) for details and troubleshooting.
+
+## Environment Variables
+
+Validated at startup with Zod (`src/infra/env/env.ts`); the app refuses to boot if they are invalid.
+
+| Variable       | Required | Default | Description                           |
+| -------------- | :------: | ------- | ------------------------------------- |
+| `DATABASE_URL` | Yes      | -       | PostgreSQL connection URL             |
+| `JWT_SECRET`   | Yes      | -       | Secret used to sign JWT access tokens |
+| `PORT`         | No       | `3333`  | HTTP port                             |
+
+## Scripts
+
+| Command                | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `pnpm start:dev`       | Run in watch mode                          |
+| `pnpm build`           | Compile the project                        |
+| `pnpm start:prod`      | Run the compiled build (`dist/main`)       |
+| `pnpm test`            | Run unit tests                             |
+| `pnpm test:watch`      | Run unit tests in watch mode               |
+| `pnpm test:e2e`        | Run end-to-end tests (requires PostgreSQL) |
+| `pnpm test:e2e:watch`  | Run e2e tests in watch mode                |
+| `pnpm lint`            | Lint and auto-fix                          |
+
+## API Overview
+
+All routes except `POST /auth` require `Authorization: Bearer <accessToken>`.
+
+| Method   | Route                         | Access            | Description                     |
+| -------- | ----------------------------- | ----------------- | ------------------------------- |
+| `POST`   | `/auth`                       | Public            | Authenticate, returns a token   |
+| `POST`   | `/salespersons`               | Manager           | Register a salesperson          |
+| `GET`    | `/salespersons?page=1`        | Manager           | List salespersons (20 per page) |
+| `GET`    | `/salespersons/:id`           | Manager           | Get a salesperson by ID         |
+| `PATCH`  | `/salespersons/:id`           | Manager           | Update a salesperson            |
+| `PATCH`  | `/salespersons/password/:id`  | Manager           | Change a salesperson's password |
+| `DELETE` | `/salespersons/:id`           | Manager           | Inactivate a salesperson        |
+| `POST`   | `/clients`                    | Authenticated     | Register a client               |
+
+Full request/response details: [docs/api.md](docs/api.md).
+
+## Project Structure
+
+```text
+sales-crm-nest/
+├── prisma/                  # Schema, migrations and seed
+├── src/
+│   ├── core/                # Shared kernel: Entity, AggregateRoot, Either, DomainEvents
+│   ├── main/crm/
+│   │   ├── enterprise/      # Domain: entities, enums, domain events, entity errors
+│   │   └── app/             # Application: use cases, repository/crypto ports, event handlers
+│   └── infra/               # NestJS adapters (framework-specific code)
+│       ├── auth/            #   JWT strategy, guard, @CurrentUser decorator
+│       ├── crypt/           #   bcrypt hasher and JWT encrypter
+│       ├── db/prisma/       #   Prisma service, repositories and mappers
+│       ├── env/             #   Zod-validated configuration
+│       └── http/            #   Controllers, DTOs, presenters, pipes
+├── tests/                   # In-memory repos, fakes and factories
+├── docs/                    # Detailed documentation
+├── client.http              # Sample HTTP requests
+└── docker-compose.yml
+```
+
+## Architecture
+
+The code follows Clean Architecture with a strict dependency rule: **dependencies point inward**. The domain knows nothing about NestJS or Prisma.
+
+```mermaid
+flowchart LR
+    HTTP["infra/http<br/>controllers, DTOs, pipes"] --> APP["main/crm/app<br/>use cases, ports"]
+    DB["infra/db<br/>Prisma repositories"] -. implements ports .-> APP
+    CRYPT["infra/crypt<br/>bcrypt, JWT"] -. implements ports .-> APP
+    APP --> DOMAIN["main/crm/enterprise<br/>entities, events"]
+    APP --> CORE["core<br/>Either, Entity, DomainEvents"]
+    DOMAIN --> CORE
+```
+
+Every use case returns an `Either<Error, Result>`, and controllers translate each domain error into the proper HTTP status.
+
+Details: [docs/architecture.md](docs/architecture.md) and [docs/domain-events.md](docs/domain-events.md).
+
+## Testing
+
+- **Unit tests** (`src/**/*.test.ts`): use cases against in-memory repositories, fake cryptography and Faker-based factories. No database required.
+- **E2E tests** (`src/**/*.e2e.ts`): controllers over HTTP with Supertest. Each run creates an isolated PostgreSQL schema, applies migrations and drops it afterwards.
+
+```bash
+pnpm test
+pnpm test:e2e
+```
+
+Details: [docs/testing.md](docs/testing.md).
+
+## Documentation
+
+| Document                                  | Contents                                                |
+| ----------------------------------------- | ------------------------------------------------------- |
+| [Architecture](docs/architecture.md)      | Layers, dependency injection, error handling, auth flow |
+| [API Reference](docs/api.md)              | Endpoints, payloads, status codes                       |
+| [Domain Model](docs/domain-model.md)      | Aggregates, database schema, opportunity life cycle     |
+| [Domain Events](docs/domain-events.md)    | Event catalog, handlers, dispatch flow                  |
+| [Testing](docs/testing.md)                | Unit and e2e strategy                                   |
+| [Development](docs/development.md)        | Docker, migrations, seeding, troubleshooting            |
+
+## Roadmap
+
+- [ ] HTTP endpoints for clients (list, get, update, inactivate)
+- [ ] HTTP endpoints for sales opportunities (register, update, list, mark as lost/delivered)
+- [ ] Persistence for sales opportunities (Prisma model and repository)
+- [ ] Register domain event handlers in the Nest application and add a real notification channel (e-mail/push)
+- [ ] Delivery photo upload (storage adapter)
+- [ ] CI pipeline (lint, unit and e2e tests)
 
 ## License
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+Private project (`UNLICENSED`).
