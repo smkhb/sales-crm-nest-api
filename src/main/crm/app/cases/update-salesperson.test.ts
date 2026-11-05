@@ -41,7 +41,7 @@ describe('Update Salesperson', () => {
       name: 'Salesperson Updated',
       email: 'salesperson@example.com',
       phone: '11988888888',
-      role: SalespersonRole.saleperson,
+      role: SalespersonRole.salesperson,
     });
 
     expect(result.isRight()).toBe(true);
@@ -68,7 +68,7 @@ describe('Update Salesperson', () => {
       name: 'John Updated',
       email: 'johndoe@example.com',
       phone: '11988888888',
-      role: SalespersonRole.saleperson,
+      role: SalespersonRole.salesperson,
     });
 
     expect(result.isLeft()).toBe(true);
@@ -95,7 +95,7 @@ describe('Update Salesperson', () => {
       name: 'Salesperson Updated',
       email: 'manager@example.com', // !Trying to update to an email that already exists
       phone: '11988888888',
-      role: SalespersonRole.saleperson,
+      role: SalespersonRole.salesperson,
     });
 
     expect(result.isLeft()).toBe(true);
@@ -121,7 +121,7 @@ describe('Update Salesperson', () => {
       name: 'Salesperson Updated',
       email: 'manager@example.com',
       phone: '11988888888',
-      role: SalespersonRole.saleperson,
+      role: SalespersonRole.salesperson,
     });
 
     expect(result.isLeft()).toBe(true);

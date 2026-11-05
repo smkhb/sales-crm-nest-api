@@ -94,7 +94,7 @@ export class Salesperson extends AggregateRoot<SalespersonProps> {
     const salesPerson = new Salesperson(
       {
         ...props,
-        role: props.role ?? SalespersonRole.saleperson,
+        role: props.role ?? SalespersonRole.salesperson,
         isActive: props.isActive ?? true,
         createdAt: props.createdAt ?? new Date(),
       },

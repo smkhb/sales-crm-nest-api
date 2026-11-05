@@ -17,7 +17,7 @@ export class SalespersonFactoryE2E {
         email: `johndoe-${randomUUID()}@example.com`,
         password: 'password-hash',
         phone: '123456789',
-        role: SalespersonRole.saleperson,
+        role: SalespersonRole.salesperson,
         ...override,
       },
     });

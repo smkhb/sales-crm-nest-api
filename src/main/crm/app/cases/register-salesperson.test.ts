@@ -63,7 +63,7 @@ describe('Register Salesperson', () => {
   });
 
   it('should not be able to register a salesperson if the executor is not a manager', async () => {
-    const salesperson = makeSalesperson({ role: SalespersonRole.saleperson });
+    const salesperson = makeSalesperson({ role: SalespersonRole.salesperson });
     await salespersonsRepo.create(salesperson);
 
     const result = await sut.execute({

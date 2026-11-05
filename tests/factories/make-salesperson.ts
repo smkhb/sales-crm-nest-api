@@ -17,7 +17,7 @@ export function makeSalesperson(
       phone: faker.phone.number(),
       passwordHash: faker.internet.password(),
 
-      role: SalespersonRole.saleperson,
+      role: SalespersonRole.salesperson,
       isActive: true,
 
       ...override,
