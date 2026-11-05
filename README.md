@@ -244,12 +244,3 @@ Details: [docs/testing.md](docs/testing.md).
 | [Domain Events](docs/domain-events.md)    | Event catalog, handlers, dispatch flow                  |
 | [Testing](docs/testing.md)                | Unit and e2e strategy                                   |
 | [Development](docs/development.md)        | Docker, migrations, seeding, troubleshooting            |
-
-## Roadmap
-
-- [ ] HTTP endpoints for clients (list, get, update, inactivate)
-- [ ] HTTP endpoints for sales opportunities (register, update, list, mark as lost/delivered)
-- [ ] Persistence for sales opportunities (Prisma model and repository)
-- [ ] Register domain event handlers in the Nest application and add a real notification channel (e-mail/push)
-- [ ] Delivery photo upload (storage adapter)
-- [ ] CI pipeline (lint, unit and e2e tests)
