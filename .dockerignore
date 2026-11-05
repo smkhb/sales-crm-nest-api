@@ -16,7 +16,7 @@ Thumbs.db
 .git
 .gitignore
 .dockerignore
-dockerfile
+Dockerfile
 docker-compose.yml
 
 .env

@@ -9,11 +9,13 @@ services:
       # volume "anónimo" para node_modules, para não misturar com o local:
       - /app/node_modules
     ports:
-      - '3000:3000'
+      - '3333:3333'
     depends_on:
       - db # Docker espera o DB iniciar antes de iniciar a API
     environment:
       DATABASE_URL: postgresql://crm_admin:crm_password@db:5432/crm_db
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-local-env}
+      PORT: 3333
 
   db:
     container_name: postgres_crm
