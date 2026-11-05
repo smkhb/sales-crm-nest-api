@@ -253,7 +253,3 @@ Details: [docs/testing.md](docs/testing.md).
 - [ ] Register domain event handlers in the Nest application and add a real notification channel (e-mail/push)
 - [ ] Delivery photo upload (storage adapter)
 - [ ] CI pipeline (lint, unit and e2e tests)
-
-## License
-
-Private project (`UNLICENSED`).
