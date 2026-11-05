@@ -1,5 +1,4 @@
-<img width="3872" height="1088" alt="banner-crm-nest" src="https://github.com/user-attachments/assets/adc11e65-32d7-40c8-a9f4-fdbf2517daa8" />
-
+<img width="3872" height="1088" alt="banner-crm-nest-api" src="https://github.com/user-attachments/assets/7ff5281d-9b38-4897-b419-78c1a15bd60a" />
 <div align="center">
   <img src="https://img.shields.io/badge/NestJS-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
   <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
